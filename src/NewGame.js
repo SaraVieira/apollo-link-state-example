@@ -11,13 +11,14 @@ class NewGame extends Component {
   }
 
   createGame = async () => {
-    const { createGame, currentGame } = this.props
+    const { createGame, currentGame, resetCurrentGame } = this.props
     try {
       await createGame({
         variables: {
           ...currentGame
         }
       })
+      await resetCurrentGame()
       this.setState({ created: true })
     } catch (err) {
       this.setState({ error: true })
@@ -128,8 +129,20 @@ const updateGame = gql`
   }
 `
 
+const resetCurrentGame = gql`
+  mutation {
+    resetCurrentGame @client {
+      teamAScore
+      teamBScore
+      teamAName
+      teamBName
+    }
+  }
+`
+
 export default compose(
   graphql(createGame, { name: 'createGame' }),
+  graphql(resetCurrentGame, { name: 'resetCurrentGame' }),
   graphql(updateGame),
   graphql(getCurrentGame, {
     props: ({ data: { currentGame, loading } }) => ({

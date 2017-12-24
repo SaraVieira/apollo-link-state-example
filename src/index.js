@@ -48,6 +48,18 @@ const stateLink = withClientState({
         }
 
         cache.writeQuery({ query, data })
+      },
+      resetCurrentGame: (_, d, { cache }) => {
+        const data = {
+          currentGame: {
+            teamAScore: 0,
+            teamBScore: 0,
+            teamAName: 'Team A',
+            teamBName: 'Team B'
+          }
+        }
+
+        cache.writeData({ data })
       }
     }
   }
