@@ -55,6 +55,6 @@ const AllGames = gql`
 export default graphql(AllGames, {
   props: ({ data: { loading, allGames } }) => ({
     loading: loading,
-    games: allGames,
-  }),
+    games: allGames
+  })
 })(App)
