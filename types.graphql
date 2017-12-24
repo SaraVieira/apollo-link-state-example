@@ -3,8 +3,8 @@
 
 type Game @model {
   id: ID! @isUnique
-  teamAScore: Int
-  teamBScore: Int
-  teamAName: String
-  teamBName: String
+  teamAScore: Int! @migrationValue(value: 0)
+  teamBScore: Int! @migrationValue(value: 0)
+  teamAName: String!
+  teamBName: String!
 }

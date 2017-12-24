@@ -1,26 +1,140 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { graphql, compose } from 'react-apollo'
+import gql from 'graphql-tag'
+import TeamCard from './teamCard'
+import { Error, Success } from './Alerts'
 
-const NewGame = () => (
-  <div className="pa4 flex justify-center">
-    <article class="mw5 bg-white br3 pa3 pa4-ns mv3 ba b--black-10 w-25 pa3 mr2">
-      <div class="tc">
-        <h1 class="f3 mb2 avenir">Team A</h1>
-        <h2 class="f5 fw4 gray mt0 avenir">0</h2>
-        <button className="f6 link dim br3 ph3 pv2 mb2 dib white bg-blue no-outline">
-            Goal
+class NewGame extends Component {
+  state = {
+    created: false,
+    error: false
+  }
+
+  createGame = async () => {
+    const { createGame, currentGame } = this.props
+    try {
+      await createGame({
+        variables: {
+          ...currentGame
+        }
+      })
+      this.setState({ created: true })
+    } catch (err) {
+      this.setState({ error: true })
+    }
+  }
+
+  render () {
+    const { currentGame, mutate } = this.props
+    const { created, error } = this.state
+
+    return (
+      <div className="pa4 flex flex-column items-center">
+        {created && <Success />}
+        {error && <Error />}
+        <div className="flex justify-center">
+          <TeamCard
+            name={currentGame.teamAName}
+            onChangeName={e =>
+              mutate({
+                variables: {
+                  index: 'teamAName',
+                  value: e.target.value
+                }
+              })
+            }
+            goals={currentGame.teamAScore}
+            onGoal={() =>
+              mutate({
+                variables: {
+                  index: 'teamAScore',
+                  value: parseInt(currentGame.teamAScore, 10) + 1
+                }
+              })
+            }
+          />
+          <TeamCard
+            name={currentGame.teamBName}
+            onChangeName={e =>
+              mutate({
+                variables: {
+                  index: 'teamBName',
+                  value: e.target.value
+                }
+              })
+            }
+            goals={currentGame.teamBScore}
+            onGoal={() =>
+              mutate({
+                variables: {
+                  index: 'teamBScore',
+                  value: parseInt(currentGame.teamBScore, 10) + 1
+                }
+              })
+            }
+          />
+        </div>
+        <button
+          onClick={this.createGame}
+          className="f6 link dim br3 ph3 pv2 mb2 dib white bg-blue no-outline"
+        >
+          Game Finished
         </button>
       </div>
-    </article>
-    <article class="mw5 bg-white br3 pa3 pa4-ns mv3 ba b--black-10 w-25 pa3 mr2">
-      <div class="tc">
-        <h1 class="f3 avenir mb2">Team B</h1>
-        <h2 class="f5 fw4 avenir gray mt0">0</h2>
-        <button className="f6 link dim br3 ph3 pv2 mb2 dib white bg-blue no-outline">
-            Goal
-        </button>
-      </div>
-    </article>
-  </div>
-)
+    )
+  }
+}
 
-export default NewGame
+const createGame = gql`
+  mutation createGame(
+    $teamAScore: Int!
+    $teamBScore: Int!
+    $teamAName: String!
+    $teamBName: String!
+  ) {
+    createGame(
+      teamAScore: $teamAScore
+      teamBScore: $teamBScore
+      teamAName: $teamAName
+      teamBName: $teamBName
+    ) {
+      teamAName
+      teamBName
+      teamAScore
+      teamBScore
+    }
+  }
+`
+
+const getCurrentGame = gql`
+  query {
+    currentGame @client {
+      teamAScore
+      teamBScore
+      teamAName
+      teamBName
+    }
+  }
+`
+
+const updateGame = gql`
+  mutation updateGame($index: String!, $value: String!) {
+    updateGame(index: $index, value: $value) @client {
+      teamAScore
+      teamBScore
+      teamAName
+      teamBName
+    }
+  }
+`
+
+export default compose(
+  graphql(createGame, { name: 'createGame' }),
+  graphql(updateGame),
+  graphql(getCurrentGame, {
+    props: ({ data: { currentGame, loading } }) => ({
+      currentGame,
+      loading
+    })
+  })
+)(NewGame)

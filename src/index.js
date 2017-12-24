@@ -4,6 +4,7 @@ import 'tachyons'
 import App from './App'
 import NewGame from './NewGame'
 import { ApolloProvider } from 'react-apollo'
+import gql from 'graphql-tag'
 
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { withClientState } from 'apollo-link-state'
@@ -16,13 +17,37 @@ const cache = new InMemoryCache()
 
 const stateLink = withClientState({
   cache,
+  defaults: {
+    currentGame: {
+      __typename: 'currentGame',
+      teamAScore: 0,
+      teamBScore: 0,
+      teamAName: 'Team A',
+      teamBName: 'Team B'
+    }
+  },
   resolvers: {
     Mutation: {
-      updateNetworkStatus: (_, { isConnected }, { cache }) => {
+      updateGame: (_, { index, value }, { cache }) => {
+        const query = gql`
+          query GetCurrentGame {
+            currentGame @client {
+              teamAScore
+              teamBScore
+              teamAName
+              teamBName
+            }
+          }
+        `
+        const previous = cache.readQuery({ query })
         const data = {
-          networkStatus: { isConnected }
+          currentGame: {
+            ...previous.currentGame,
+            [index]: value
+          }
         }
-        cache.writeData({ data })
+
+        cache.writeQuery({ query, data })
       }
     }
   }

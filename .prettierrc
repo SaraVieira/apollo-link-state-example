@@ -1,7 +1,8 @@
 {
   "singleQuote": true,
   "trailingComma": "es5",
-  "useTabs": true,
+  "useTabs": false,
+  "semi": false,
   "overrides": [
     {
       "files": "*.md",
