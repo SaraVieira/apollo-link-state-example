@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
 import TeamCard from './teamCard'
 import { Error, Success } from './Alerts'
+import {resetCurrentGame,
+  getCurrentGame,
+  updateGame,
+  createGame } from './grahql'
 
 class NewGame extends Component {
   state = {
@@ -26,7 +29,7 @@ class NewGame extends Component {
   }
 
   render () {
-    const { currentGame, mutate } = this.props
+    const { currentGame, updateGame } = this.props
     const { created, error } = this.state
 
     return (
@@ -37,7 +40,7 @@ class NewGame extends Component {
           <TeamCard
             name={currentGame.teamAName}
             onChangeName={e =>
-              mutate({
+              updateGame({
                 variables: {
                   index: 'teamAName',
                   value: e.target.value
@@ -46,7 +49,7 @@ class NewGame extends Component {
             }
             goals={currentGame.teamAScore}
             onGoal={() =>
-              mutate({
+              updateGame({
                 variables: {
                   index: 'teamAScore',
                   value: parseInt(currentGame.teamAScore, 10) + 1
@@ -57,7 +60,7 @@ class NewGame extends Component {
           <TeamCard
             name={currentGame.teamBName}
             onChangeName={e =>
-              mutate({
+              updateGame({
                 variables: {
                   index: 'teamBName',
                   value: e.target.value
@@ -66,7 +69,7 @@ class NewGame extends Component {
             }
             goals={currentGame.teamBScore}
             onGoal={() =>
-              mutate({
+              updateGame({
                 variables: {
                   index: 'teamBScore',
                   value: parseInt(currentGame.teamBScore, 10) + 1
@@ -86,64 +89,10 @@ class NewGame extends Component {
   }
 }
 
-const createGame = gql`
-  mutation createGame(
-    $teamAScore: Int!
-    $teamBScore: Int!
-    $teamAName: String!
-    $teamBName: String!
-  ) {
-    createGame(
-      teamAScore: $teamAScore
-      teamBScore: $teamBScore
-      teamAName: $teamAName
-      teamBName: $teamBName
-    ) {
-      teamAName
-      teamBName
-      teamAScore
-      teamBScore
-    }
-  }
-`
-
-const getCurrentGame = gql`
-  query {
-    currentGame @client {
-      teamAScore
-      teamBScore
-      teamAName
-      teamBName
-    }
-  }
-`
-
-const updateGame = gql`
-  mutation updateGame($index: String!, $value: String!) {
-    updateGame(index: $index, value: $value) @client {
-      teamAScore
-      teamBScore
-      teamAName
-      teamBName
-    }
-  }
-`
-
-const resetCurrentGame = gql`
-  mutation {
-    resetCurrentGame @client {
-      teamAScore
-      teamBScore
-      teamAName
-      teamBName
-    }
-  }
-`
-
 export default compose(
   graphql(createGame, { name: 'createGame' }),
   graphql(resetCurrentGame, { name: 'resetCurrentGame' }),
-  graphql(updateGame),
+  graphql(updateGame, {name: 'updateGame'}),
   graphql(getCurrentGame, {
     props: ({ data: { currentGame, loading } }) => ({
       currentGame,

@@ -1,7 +1,7 @@
 import React from 'react'
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import { Link } from 'react-router-dom'
+import { allGames } from './grahql'
 
 const App = ({ games, loading }) => (
   <div className="pa4">
@@ -40,19 +40,7 @@ const App = ({ games, loading }) => (
   </div>
 )
 
-const AllGames = gql`
-  query AllGames {
-    allGames {
-      teamAName
-      teamBName
-      teamAScore
-      teamBScore
-      id
-    }
-  }
-`
-
-export default graphql(AllGames, {
+export default graphql(allGames, {
   props: ({ data: { loading, allGames } }) => ({
     loading: loading,
     games: allGames

@@ -15,17 +15,19 @@ import { ApolloLink } from 'apollo-link'
 
 const cache = new InMemoryCache()
 
+const defaultState = {
+  currentGame: {
+    __typename: 'currentGame',
+    teamAScore: 0,
+    teamBScore: 0,
+    teamAName: 'Team A',
+    teamBName: 'Team B'
+  }
+}
+
 const stateLink = withClientState({
   cache,
-  defaults: {
-    currentGame: {
-      __typename: 'currentGame',
-      teamAScore: 0,
-      teamBScore: 0,
-      teamAName: 'Team A',
-      teamBName: 'Team B'
-    }
-  },
+  defaults: defaultState,
   resolvers: {
     Mutation: {
       updateGame: (_, { index, value }, { cache }) => {
@@ -50,16 +52,7 @@ const stateLink = withClientState({
         cache.writeQuery({ query, data })
       },
       resetCurrentGame: (_, d, { cache }) => {
-        const data = {
-          currentGame: {
-            teamAScore: 0,
-            teamBScore: 0,
-            teamAName: 'Team A',
-            teamBName: 'Team B'
-          }
-        }
-
-        cache.writeData({ data })
+        cache.writeData({ defaultState })
       }
     }
   }
