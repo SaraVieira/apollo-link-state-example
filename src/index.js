@@ -52,7 +52,7 @@ const stateLink = withClientState({
         cache.writeQuery({ query, data })
       },
       resetCurrentGame: (_, d, { cache }) => {
-        cache.writeData({ defaultState })
+        cache.writeData({ data : defaultState })
       }
     }
   }
