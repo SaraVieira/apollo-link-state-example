@@ -1,0 +1,30 @@
+{
+  "project": {
+    "name": "apollo-link-state-example",
+    "repository": "https://github.com/SaraVieira/apollo-link-state-example",
+    "description": "incredible things",
+    "readme_path": "./README.md"
+  },
+  "build": {
+    "dist_dir": "./public/",
+    "static_dir": "./static/",
+    "path_prefix": "apollo-link-state-example"
+  },
+  "styles": {
+    "theme": "dark"
+  },
+  "components": {
+    "md_book": {
+      "theme": true
+    },
+    "changelog": false,
+    "funding": {
+      "yml_path": ".github/FUNDING.yml"
+    }
+  },
+  "marketing": {
+    "social": {
+      "image": "https://assets-prd.ignimgs.com/2021/12/09/masseffect-1639016658616.jpg?width=36&crop=1%3A1%2Csmart&dpr=2"
+    }
+  }
+}
