@@ -1,0 +1,29 @@
+name: Oranda
+on:
+  push:
+    branches:
+      - master
+jobs:
+  web:
+    name: Build oranda
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install and run oranda
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/oranda/releases/latest/download/oranda-installer.sh | sh
+          oranda build
+      - name: Deploy oranda
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        if: ${{ github.ref == 'refs/heads/master' }}
+        with:
+          branch: gh-pages
+          folder: public
+          token: ${{ secrets.GITHUB_TOKEN }}
+          single-commit: true
